@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: emote-audio-studio
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: EAS_CLOUD
+        value: "1"
+      - key: CLOUDFLARE_TURNSTILE_SECRET_KEY
+        value: "1x0000000000000000000000000000000AA"
+      - key: EAS_ENFORCE_TURNSTILE
+        value: "0"
+

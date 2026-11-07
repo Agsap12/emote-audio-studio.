@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emote Audio Studio</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<div class="glass-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-box">🎵</div>
+    <div class="title-box">
+      <h1>Emote Audio Studio</h1>
+      <p>Roblox Auto Bridge &amp; Asset Tracker</p>
+    </div>
+  </header>
+
+  <!-- User Status Card -->
+  <section class="card" id="userCard">
+    <div class="card-header">
+      <span class="badge" id="robloxStatus">Memeriksa akun...</span>
+    </div>
+    <div class="user-info" id="userInfo" style="display:none">
+      <div class="avatar" id="userAvatar">👤</div>
+      <div class="user-meta">
+        <b id="userName">Roblox User</b>
+        <small id="userId">ID: -</small>
+      </div>
+    </div>
+    
+    <div class="group-select-box" id="groupBox" style="display:none">
+      <label for="groupSelect">Grup Roblox Terdeteksi:</label>
+      <div class="row">
+        <select id="groupSelect"></select>
+        <button class="btn main sm" id="btnApplyGroup" title="Kirim ID grup ini ke EAS">Pakai</button>
+      </div>
+    </div>
+    
+    <div class="not-logged" id="notLogged" style="display:none">
+      <p>Kamu belum login ke akun Roblox di browser ini.</p>
+      <a href="https://www.roblox.com/login" target="_blank" class="btn main sm">Login ke Roblox</a>
+    </div>
+  </section>
+
+  <!-- Recent Detected Assets -->
+  <section class="card">
+    <div class="card-header">
+      <h2>Asset ID Terdeteksi</h2>
+      <button class="btn-text" id="btnClearHistory">Hapus</button>
+    </div>
+    <div class="asset-list" id="assetList">
+      <div class="empty-state">Belum ada ID terdeteksi.</div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <footer class="footer">
+    <button class="btn main" id="btnOpenWeb">Buka Emote Audio Studio Web</button>
+  </footer>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
+

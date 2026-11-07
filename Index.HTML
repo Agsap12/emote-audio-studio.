@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Emote Audio Studio — Apple Liquid Glass Edition</title>
+<!-- Cloudflare Turnstile API -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+/* ==========================================================================
+   Apple Liquid Glass & Spatial UI Design System (iOS 18 / visionOS Inspired)
+   ========================================================================== */
+:root {
+  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+  
+  /* Light Mode Palette */
+  --bg-base: #f5f5f7;
+  --text-main: #1d1d1f;
+  --text-muted: #86868b;
+  --text-subtle: #a1a1a6;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-glow: rgba(0, 113, 227, 0.25);
+  --accent2: #2997ff;
+  --accent-gradient: linear-gradient(135deg, #0071e3 0%, #2997ff 100%);
+  --success: #34c759;
+  --danger: #ff3b30;
+  --warning: #ff9500;
+  
+  /* Liquid Glass Token System */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.65);
+  --liquid-glass-border: rgba(255, 255, 255, 0.45);
+  --liquid-glass-inset: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04);
+  --liquid-glass-shadow: 0 16px 40px -12px rgba(0, 20, 60, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+  --field-bg: rgba(255, 255, 255, 0.72);
+  --field-border: rgba(0, 0, 0, 0.08);
+  --field-focus: rgba(0, 113, 227, 0.15);
+  --card-radius: 26px;
+  --pill-radius: 980px;
+
+  /* Waveform Colors */
+  --wf-off: rgba(0, 113, 227, 0.15);
+  --wf-on: #0071e3;
+  --wf-sel: rgba(0, 113, 227, 0.1);
+  --wf-h: #0077ed;
+  --wf-play: #ff9500;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-base: #000000;
+    --text-main: #f5f5f7;
+    --text-muted: #86868b;
+    --text-subtle: #6e6e73;
+    --accent: #2997ff;
+    --accent-hover: #47a7ff;
+    --accent-glow: rgba(41, 151, 255, 0.35);
+    --accent2: #64d2ff;
+    --accent-gradient: linear-gradient(135deg, #2997ff 0%, #64d2ff 100%);
+    
+    --liquid-glass-bg: rgba(26, 26, 30, 0.58);
+    --liquid-glass-border: rgba(255, 255, 255, 0.12);
+    --liquid-glass-inset: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+    --liquid-glass-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+    --field-bg: rgba(255, 255, 255, 0.06);
+    --field-border: rgba(255, 255, 255, 0.12);
+    --field-focus: rgba(41, 151, 255, 0.25);
+
+    --wf-off: rgba(255, 255, 255, 0.12);
+    --wf-on: #2997ff;
+    --wf-sel: rgba(41, 151, 255, 0.18);
+    --wf-h: #64d2ff;
+    --wf-play: #ffd60a;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-base: #000000;
+  --text-main: #f5f5f7;
+  --text-muted: #86868b;
+  --text-subtle: #6e6e73;
+  --accent: #2997ff;
+  --accent-hover: #47a7ff;
+  --accent-glow: rgba(41, 151, 255, 0.35);
+  --accent2: #64d2ff;
+  --accent-gradient: linear-gradient(135deg, #2997ff 0%, #64d2ff 100%);
+  
+  --liquid-glass-bg: rgba(26, 26, 30, 0.58);
+  --liquid-glass-border: rgba(255, 255, 255, 0.12);
+  --liquid-glass-inset: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+  --liquid-glass-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  --field-bg: rgba(255, 255, 255, 0.06);
+  --field-border: rgba(255, 255, 255, 0.12);
+  --field-focus: rgba(41, 151, 255, 0.25);
+
+  --wf-off: rgba(255, 255, 255, 0.12);
+  --wf-on: #2997ff;
+  --wf-sel: rgba(41, 151, 255, 0.18);
+  --wf-h: #64d2ff;
+  --wf-play: #ffd60a;
+
+  color-scheme: dark;
+}
+
+/* Base Setup */
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: var(--font-stack);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-main);
+}
+
+/* Ambient Liquid Light Orbs (Floating Glass Atmosphere) */
+body {
+  position: relative;
+  overflow-x: hidden;
+  padding: 30px 16px 70px;
+}
+
+body::before, body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+body::before {
+  width: 55vmax;
+  height: 55vmax;
+  top: -15vmax;
+  left: -15vmax;
+  background: radial-gradient(circle, rgba(0, 113, 227, 0.28) 0%, rgba(94, 224, 230, 0.12) 60%, transparent 80%);
+  animation: liquidFloat1 18s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 50vmax;
+  height: 50vmax;
+  bottom: -10vmax;
+  right: -10vmax;
+  background: radial-gradient(circle, rgba(162, 89, 255, 0.22) 0%, rgba(41, 151, 255, 0.15) 50%, transparent 80%);
+  animation: liquidFloat2 22s ease-in-out infinite alternate;
+}
+
+@keyframes liquidFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6vw, 8vh) scale(1.08); }
+  100% { transform: translate(12vw, 3vh) scale(0.95); }
+}
+
+@keyframes liquidFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8vw, -6vh) scale(1.12); }
+  100% { transform: translate(-4vw, -12vh) scale(0.92); }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+/* Liquid Glass Cards (Spatial Frosted Glass) */
+.card {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(36px) saturate(190%) contrast(102%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%) contrast(102%);
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--card-radius);
+  padding: 24px;
+  box-shadow: var(--liquid-glass-inset), var(--liquid-glass-shadow);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  box-shadow: var(--liquid-glass-inset), 0 24px 48px -12px rgba(0, 20, 60, 0.12);
+}
+
+/* Header */
+header.card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+}
+
+.brand-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--accent-gradient);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 18px var(--accent-glow);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+header p {
+  margin: 3px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.sp { flex: 1; }
+
+/* Section Headers */
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+h2 i {
+  font-style: normal;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px var(--accent-glow);
+}
+
+/* Apple Buttons */
+.btn {
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--text-main);
+  padding: 10px 18px;
+  border-radius: var(--pill-radius);
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0.5px) scale(0.98);
+}
+
+.btn.main {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+.btn.main:hover:not(:disabled) {
+  box-shadow: 0 8px 22px var(--accent-glow);
+  filter: brightness(1.05);
+}
+
+.btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Theme Toggle Button */
+#theme {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--field-bg);
+  border: 1px solid var(--liquid-glass-border);
+}
+
+#theme svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.4s ease;
+}
+
+#theme:hover svg {
+  transform: rotate(25deg);
+}
+
+/* Inputs & Form Elements */
+input[type=text], input[type=password], input[type=number], select {
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  color: var(--text-main);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  width: 100%;
+  outline: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--field-focus);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row > input {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* Drop Area */
+#drop {
+  display: block;
+  border: 2px dashed rgba(0, 113, 227, 0.35);
+  border-radius: 20px;
+  padding: 28px 18px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(0, 113, 227, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#drop input { display: none; }
+#drop b { font-size: 0.96rem; font-weight: 600; display: block; }
+#drop small { display: block; color: var(--text-muted); margin-top: 6px; font-size: 0.8rem; }
+
+#drop:hover, #drop.over {
+  border-color: var(--accent);
+  background: var(--wf-sel);
+  transform: scale(1.006);
+}
+
+.or {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 14px 0 10px;
+  position: relative;
+}
+
+.or::before, .or::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 25%;
+  height: 1px;
+  background: var(--field-border);
+}
+.or::before { left: 10%; }
+.or::after { right: 10%; }
+
+/* Segmented Engine bar */
+.eng {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--field-border);
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: var(--pill-radius);
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+.chip b { color: var(--accent); }
+.chip.online { background: rgba(52, 199, 89, 0.15); color: var(--success); border-color: rgba(52, 199, 89, 0.35); }
+.chip.offline { background: rgba(255, 59, 48, 0.15); color: var(--danger); border-color: rgba(255, 59, 48, 0.35); }
+.chip.online b { color: var(--success); }
+.chip.offline b { color: var(--danger); }
+.status-pills { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+.btn.sm { padding: 4px 10px; font-size: 0.78rem; border-radius: 8px; }
+
+/* TikTok / YouTube Preview Card */
+#ttBox {
+  display: none;
+  margin-top: 18px;
+  gap: 16px;
+  grid-template-columns: 140px 1fr;
+  align-items: start;
+  background: var(--field-bg);
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--field-border);
+}
+#ttBox.show { display: grid; }
+#ttVid {
+  width: 140px;
+  aspect-ratio: 9/16;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #000;
+}
+#ttInfo b {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+#ttInfo small { color: var(--text-muted); font-size: 0.8rem; }
+#ttAud { width: 100%; margin: 12px 0 10px; }
+
+/* Tabs (Segmented Control Apple Style) */
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: var(--field-bg);
+  padding: 5px;
+  border-radius: 16px;
+  border: 1px solid var(--field-border);
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 10px 8px;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab small {
+  display: block;
+  font-weight: 400;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.tab.on {
+  background: var(--liquid-glass-bg);
+  color: var(--text-main);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Waveform Canvas Area */
+.wave {
+  position: relative;
+  height: 150px;
+  border-radius: 18px;
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 18px;
+}
+.empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Transport Controls */
+.transport {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.time {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.86rem;
+  font-weight: 700;
+  background: var(--field-bg);
+  padding: 6px 12px;
+  border-radius: var(--pill-radius);
+  border: 1px solid var(--field-border);
+}
+
+.trim {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+.trim label, .ctl label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Apple Range Sliders */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+}
+.ctl .h {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.ctl output {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--field-border);
+  outline: none;
+  margin: 8px 0;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Presets & Chips */
+.presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.pchip {
+  display: inline-flex;
+}
+.pchip .btn:first-child { border-radius: 12px 0 0 12px; }
+.pchip .btn.x { border-radius: 0 12px 12px 0; border-left: 0; padding: 7px 10px; color: var(--danger); }
+
+/* Progress Bars */
+.pbar {
+  height: 12px;
+  border-radius: var(--pill-radius);
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  overflow: hidden;
+  margin-top: 10px;
+}
+.pfill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--pill-radius);
+  background: var(--accent-gradient);
+  transition: width 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+.pfill.run::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shine 1.1s linear infinite;
+}
+.pfill.bad { background: var(--danger); }
+@keyframes shine {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.steps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.step {
+  padding: 6px 14px;
+  border-radius: var(--pill-radius);
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.step.on {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.step.done {
+  border-color: var(--success);
+  background: var(--success);
+  color: #fff;
+}
+.step.err {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Result Cards */
+#result, #rbResult {
+  display: none;
+  margin-top: 14px;
+  border: 1px solid var(--accent);
+  border-radius: 18px;
+  padding: 16px;
+  background: var(--field-bg);
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+#result.show { display: flex; }
+#rbId { color: var(--accent); user-select: all; font-size: 1.05rem; }
+
+/* Details & Expandables */
+details {
+  margin-top: 14px;
+  border-top: 1px solid var(--field-border);
+  padding-top: 14px;
+}
+summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  list-style: none;
+}
+summary::before { content: "+ "; color: var(--accent); font-weight: 800; }
+details[open] summary::before { content: "− "; }
+
+.chk {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.chk input {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+}
+
+.note, #status {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
+/* Queue List */
+.qrow {
+  border: 1px solid var(--field-border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: var(--field-bg);
+  margin-top: 8px;
+}
+.qtop { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
+.qname { font-weight: 700; flex: 0 1 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qst { flex: 1; color: var(--text-muted); font-size: 0.8rem; }
+.qrow.ok .qst { color: var(--success); font-weight: 700; }
+.qrow.fail .qst { color: var(--danger); }
+
+/* Cloudflare Turnstile Box */
+.cf-box {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0 6px;
+}
+
+@media(max-width:640px) {
+  .grid { grid-template-columns: 1fr; }
+  #ttBox.show { grid-template-columns: 110px 1fr; }
+  #ttVid { width: 110px; }
+  header p { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Apple Spatial Floating Header -->
+  <header class="card">
+    <div class="brand-badge">🎵</div>
+    <div>
+      <h1>Emote Audio Studio</h1>
+      <p>Studio Audio Roblox dengan Pemrosesan Liquid Glass &amp; Open Cloud API</p>
+    </div>
+    <div class="status-pills">
+      <span class="chip" id="hdrServer" title="Status koneksi server backend">Server: <b id="hdrServerTxt">Mengecek...</b></span>
+      <span class="chip" id="hdrExt" title="Status ekstensi browser">Ekstensi: <b id="hdrExtTxt">Memeriksa...</b></span>
+      <button class="btn" id="theme" aria-label="Ganti tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Step 1: Input Source -->
+  <section class="card">
+    <h2><i>1</i>Ambil Audio</h2>
+    <label id="drop" tabindex="0">
+      <input type="file" id="fileIn" accept="audio/*,video/*">
+      <b id="dropTitle">Seret file audio atau video ke sini</b>
+      <small id="dropSub">atau klik untuk memilih (MP3, WAV, OGG, MP4)</small>
+    </label>
+    <div class="or">atau tempel link TikTok</div>
+    <div class="row">
+      <input type="text" id="ttUrl" placeholder="https://www.tiktok.com/@akun/video/..." inputmode="url">
+      <button class="btn main" id="ttGo">Ambil</button>
+    </div>
+    <div class="or">atau tempel link YouTube</div>
+    <div class="row">
+      <input type="text" id="ytUrl" placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..." inputmode="url">
+      <button class="btn main" id="ytGo">Ambil</button>
+    </div>
+    <div class="eng">
+      <span class="chip" id="engVer">yt-dlp: memeriksa...</span>
+      <button class="btn" id="engUpd">Cek &amp; perbarui yt-dlp</button>
+      <label>Cookies 
+        <select id="ckSel" aria-label="Cookies browser">
+          <option value="">Tanpa cookies</option>
+          <option value="chrome">Chrome</option>
+          <option value="edge">Edge</option>
+          <option value="firefox">Firefox</option>
+          <option value="brave">Brave</option>
+        </select>
+      </label>
+    </div>
+    <div id="ttBox">
+      <video id="ttVid" controls playsinline></video>
+      <div id="ttInfo">
+        <b id="ttTitle"></b>
+        <small id="ttAuthor"></small>
+        <audio id="ttAud" controls></audio>
+        <div class="row" style="margin-top:8px">
+          <button class="btn main" id="ttUse">Pakai di editor</button>
+          <button class="btn" id="ttDlA">Unduh audio</button>
+          <button class="btn" id="ttDlV">Unduh video</button>
+        </div>
+      </div>
+    </div>
+    <p class="note" id="ttNote">Unduh hanya konten milikmu atau yang sudah mendapat izin pemiliknya. Dari YouTube yang diambil hanya audionya (video maks 15 menit).</p>
+  </section>
+
+  <!-- Step 2: Waveform Trimmer -->
+  <section class="card">
+    <h2><i>2</i>Potong dan Dengar</h2>
+    <div class="tabs">
+      <button class="tab" id="tBefore" disabled data-m="BEFORE">Before<small>Asli, 1.0x</small></button>
+      <button class="tab" id="tUpload" disabled data-m="UPLOAD">Saat di-upload<small id="lU">File cepat</small></button>
+      <button class="tab on" id="tAfter" disabled data-m="AFTER">After in-game<small id="lA">Simulasi Roblox</small></button>
+    </div>
+    <div class="wave" id="wave">
+      <canvas id="cv"></canvas>
+      <div class="empty" id="empty">Gelombang suara muncul di sini</div>
+    </div>
+    <div class="transport">
+      <button class="btn main" id="play" disabled>Putar</button>
+      <button class="btn" id="preview" disabled>Putar potongan</button>
+      <span class="time" id="time">0:00.0 / 0:00.0</span>
+    </div>
+    <div class="trim">
+      <label>Mulai (detik)<input type="number" id="tStart" min="0" step="0.1" value="0" disabled></label>
+      <label>Selesai (detik)<input type="number" id="tEnd" min="0" step="0.1" value="0" disabled></label>
+    </div>
+    <div class="tools">
+      <button class="btn" id="resetTrim" disabled>Reset potongan</button>
+      <button class="btn" id="autoTrim" disabled>Potong bagian hening</button>
+      <button class="btn" id="reverse" disabled>Balik audio</button>
+    </div>
+    <p class="note">Geser gagang di gelombang untuk memotong, klik gelombang untuk pindah posisi. Lagu berulang di dalam potongan.</p>
+  </section>
+
+  <!-- Step 3: Sound Tuning & FX -->
+  <section class="card">
+    <h2><i>3</i>Atur Suara</h2>
+    <div class="presets">
+      <button class="btn main" id="auto" disabled>Auto Tuner</button>
+      <button class="btn" data-p="100,0.348,30,1.5,8,4.5,0">Extra bass club</button>
+      <button class="btn" data-p="100,0.348,0,1,0,0,0">Bypass polos</button>
+    </div>
+    <div class="presets" id="myPresets"></div>
+    <div class="row" style="margin-bottom:14px">
+      <input type="text" id="pName" maxlength="20" placeholder="Nama preset sendiri, lalu Simpan" aria-label="Nama preset">
+      <button class="btn" id="pSave">Simpan preset</button>
+    </div>
+    <div id="report"></div>
+    <div class="grid">
+      <div class="ctl"><div class="h">Volume <output id="oVol"></output></div><input type="range" id="vol" min="10" max="250" step="5" value="85" aria-label="Volume"></div>
+      <div class="ctl"><div class="h">Kecepatan di Roblox <output id="oSpd"></output></div><input type="range" id="spd" min="0.25" max="1" step="0.001" value="0.348" aria-label="Kecepatan"></div>
+      <div class="ctl"><div class="h">Bass <output id="oBass"></output></div><input type="range" id="bass" min="-10" max="15" step="0.5" value="6" aria-label="Bass"></div>
+      <div class="ctl"><div class="h">Vokal jernih <output id="oTre"></output></div><input type="range" id="tre" min="-10" max="15" step="0.5" value="4" aria-label="Vokal jernih"></div>
+      <div class="ctl"><div class="h">Reverb <output id="oRev"></output></div><input type="range" id="rev" min="0" max="80" step="1" value="22" aria-label="Reverb"></div>
+      <div class="ctl"><div class="h">Panjang reverb <output id="oDec"></output></div><input type="range" id="dec" min="0.3" max="3.5" step="0.1" value="1.2" aria-label="Panjang reverb"></div>
+    </div>
+    <details>
+      <summary>Efek tambahan (Echo, Fade, Normalisasi)</summary>
+      <div class="grid" style="margin-top:14px">
+        <div class="ctl"><div class="h">Gema (echo) <output id="oEch"></output></div><input type="range" id="ech" min="0" max="60" step="1" value="0" aria-label="Gema"></div>
+        <div class="ctl"><div class="h">Fade in <output id="oFi"></output></div><input type="range" id="fin" min="0" max="5" step="0.1" value="0" aria-label="Fade in"></div>
+        <div class="ctl"><div class="h">Fade out <output id="oFo"></output></div><input type="range" id="fout" min="0" max="5" step="0.1" value="0" aria-label="Fade out"></div>
+        <label class="chk"><input type="checkbox" id="norm">Samakan puncak ke maksimal saat ekspor (abaikan volume)</label>
+      </div>
+      <p class="note">Gema langsung terdengar saat memutar. Fade dan normalisasi diterapkan saat ekspor.</p>
+    </details>
+  </section>
+
+  <!-- Step 4: Export Audio -->
+  <section class="card">
+    <h2><i>4</i>Nama dan Ekspor</h2>
+    <div class="row">
+      <input type="text" id="name" maxlength="5" placeholder="5 huruf acak" aria-label="Nama file">
+      <button class="btn" id="rand">Acak</button>
+      <button class="btn" id="copy">Salin</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn main" id="export" style="flex:1" disabled>Ekspor potongan (.wav)</button>
+    </div>
+    <div id="result" draggable="true" title="Seret ke website lain atau ke desktop">
+      <div style="font-size:1.6rem">🎵</div>
+      <div>
+        <b id="rName"></b>
+        <small id="rInfo"></small>
+      </div>
+      <button class="btn" id="save" style="margin-left:auto">Simpan</button>
+    </div>
+    <div id="status">Mulai dengan memilih file atau menempel link TikTok.</div>
+  </section>
+
+  <!-- Step 5: Upload to Roblox Open Cloud -->
+  <section class="card">
+    <h2><i>5</i>Upload ke Roblox</h2>
+    <span class="chip" id="rbFile">Belum ada hasil ekspor. Saat Upload ditekan, audio diekspor otomatis.</span>
+    
+    <!-- Cloudflare Turnstile Human Verification Box -->
+    <div class="cf-box">
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="auto" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
+    </div>
+    <div id="cfStatus" style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;text-align:center;">Verifikasi keamanan Cloudflare Turnstile</div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn main" id="rbGo" style="flex:1">Upload hasil ekspor ke Roblox</button>
+    </div>
+    <div id="rbProg">
+      <div class="steps" id="rbSteps">
+        <span class="step">Ekspor</span>
+        <span class="step">Kirim ke server</span>
+        <span class="step">Diproses Roblox</span>
+        <span class="step">Selesai</span>
+      </div>
+      <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="rbBar">
+        <div class="pfill" id="rbFill"></div>
+      </div>
+      <div class="pinfo">
+        <span id="rbPhase">Menunggu...</span>
+        <span id="rbPct">0%</span>
+      </div>
+    </div>
+    <div id="rbResult">
+      <div style="font-size:1.6rem">✅</div>
+      <div>
+        <b id="rbName"></b>
+        <small>ID Sound / Asset ID: <b id="rbId"></b></small>
+      </div>
+      <button class="btn" id="rbCopy" style="margin-left:auto">Salin ID</button>
+    </div>
+    <div id="rbLinks" class="row">
+      <a class="btn main" id="rbLinkStore" target="_blank" rel="noopener">Buka halaman asset</a>
+      <a class="btn" id="rbLinkDash" target="_blank" rel="noopener">Buka Creations grup</a>
+      <button class="btn" id="rbCopyUri">Salin rbxassetid://</button>
+    </div>
+    <div id="rbStatus" class="note">Isi API key dan ID grup di bagian paling bawah halaman, lalu tekan Simpan.</div>
+
+    <!-- Batch Queue -->
+    <details id="qBox">
+      <summary>Upload banyak file sekaligus (Batch Queue)</summary>
+      <label class="qdrop" id="qDrop" tabindex="0">
+        <input type="file" id="qIn" accept="audio/*,video/*" multiple>
+        <b>Pilih atau seret beberapa file audio ke sini</b>
+        <small>Semua memakai pengaturan suara di langkah 3 dan durasi penuh tiap file. Nama dibuat acak 5 huruf.</small>
+      </label>
+      <div id="qList"></div>
+      <div id="qSumBox" style="display:none;margin-top:14px">
+        <div class="pbar"><div class="pfill" id="qFill"></div></div>
+        <div class="pinfo"><span id="qPhase"></span><span id="qPct">0%</span></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn main" id="qGo" disabled>Mulai upload semua</button>
+        <button class="btn" id="qCopy" disabled>Salin daftar selesai</button>
+        <button class="btn" id="qClear" disabled>Kosongkan</button>
+      </div>
+      <div id="qNote" class="note">Belum ada file di antrean.</div>
+    </details>
+
+    <!-- History -->
+    <details>
+      <summary id="hSum">Riwayat upload</summary>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="hCopy" disabled>Salin daftar (nama - ID)</button>
+        <button class="btn" id="hTxt" disabled>Ekspor .txt</button>
+        <button class="btn" id="hCsv" disabled>Ekspor .csv</button>
+        <button class="btn" id="hClear" disabled>Hapus semua</button>
+      </div>
+      <div id="rbHist" class="note">Belum ada.</div>
+    </details>
+  </section>
+
+  <!-- Step 6: Account & Security Settings -->
+  <section class="card" id="rbSet">
+    <h2><i>6</i>Akun dan Pengaturan</h2>
+
+    <!-- Ekstensi Browser (Roblox Bridge) Status & Auto Group -->
+    <div class="row" id="extRow" style="align-items:center;background:var(--field-bg);padding:10px 14px;border-radius:14px;border:1px solid var(--field-border);margin-bottom:12px">
+      <div style="flex:1">
+        <b>Ekstensi Browser (Roblox Auto Bridge)</b>
+        <small id="extDetail" style="display:block;color:var(--text-muted)">Mencari ekstensi browser...</small>
+      </div>
+      <span class="chip" id="extStatusChip">Menghubungkan...</span>
+      <button class="btn sm" id="btnExtSync" style="display:none">Sinkronkan</button>
+    </div>
+    <div id="extGroupPicker" style="display:none;margin-bottom:14px" class="row">
+      <select id="selExtGroup" style="flex:1" aria-label="Grup Roblox Terdeteksi"></select>
+      <button class="btn main sm" id="btnApplyExtGroup">Gunakan Grup Ini</button>
+    </div>
+
+    <div class="row">
+      <input type="password" id="rbKey" placeholder="API key Roblox (Open Cloud)" autocomplete="off" aria-label="API key Roblox">
+      <input type="text" id="rbGroup" placeholder="ID grup (angka)" inputmode="numeric" autocomplete="off" aria-label="ID grup Roblox">
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn main" id="rbSave">Simpan</button>
+      <button class="btn" id="rbShowKey">Lihat key</button>
+      <button class="btn" id="rbClear">Hapus data</button>
+    </div>
+    <div class="row" style="margin-top:14px;gap:18px">
+      <label class="chk"><input type="checkbox" id="oClick">Suara klik</label>
+      <label class="chk"><input type="checkbox" id="oDone">Bunyi dan judul tab saat upload selesai</label>
+      <label class="chk"><input type="checkbox" id="oCopy">Salin ID otomatis saat selesai</label>
+    </div>
+    <p class="note" id="rbSetNote">API key harus punya permission asset:read dan asset:write untuk grup ini. Data disimpan hanya di browser ini secara aman.</p>
+
+    <!-- Pengaturan Server Backend (Lokal / Cloud 24 Jam) -->
+    <details style="margin-top:14px">
+      <summary>Pengaturan Server Backend (Lokal / Cloud 24 Jam)</summary>
+      <div style="margin-top:12px" class="row">
+        <input type="text" id="apiBaseInput" placeholder="Kosongkan untuk server lokal, atau isi URL Cloud (cth: https://my-eas.onrender.com)" aria-label="Alamat Backend">
+        <button class="btn main" id="btnSaveApiBase">Simpan &amp; Tes</button>
+      </div>
+      <div style="margin-top:8px" class="row" style="align-items:center">
+        <span class="chip" id="backendStatusChip">Server: Menguji...</span>
+        <small id="backendNote" style="color:var(--text-muted)">Default: http://127.0.0.1:8765</small>
+      </div>
+    </details>
+  </section>
+</div>
+
+<!-- ==========================================================================
+     Application Logic & Web Audio Pipeline (Preserved 100% Intact)
+     ========================================================================== -->
+<script>
+const $=id=>document.getElementById(id),root=document.documentElement;
+let ctx=null,buf=null,src=null,playing=false,mode='AFTER',peaks=[],tA=0,tB=0,pos=0,t0=0,off0=0,rate0=1,raf=0,nodes={},outFile=null,outUrl=null,col={},tt=null;
+const cv=$('cv'),g=cv.getContext('2d'),say=s=>$('status').textContent=s;
+
+/* Backend Configuration (Local / Cloud 24 Jam) */
+let apiBase = (localStorage.getItem('eas-api-base') || '').trim();
+const API = path => (apiBase ? apiBase.replace(/\/+$/, '') : '') + path;
+
+/* Cloudflare Turnstile token */
+let turnstileToken = '';
+window.onTurnstileSuccess = token => {
+  turnstileToken = token;
+  $('cfStatus').innerHTML = '<span style="color:var(--success);font-weight:600">✓ Manusia Terverifikasi (Turnstile)</span>';
+};
+window.onTurnstileExpired = () => {
+  turnstileToken = '';
+  $('cfStatus').textContent = 'Verifikasi kedaluwarsa, silakan centang ulang.';
+};
+window.onTurnstileError = () => {
+  turnstileToken = '';
+  $('cfStatus').textContent = 'Gagal memuat Cloudflare Turnstile.';
+};
+
+/* Ekstensi Browser & Roblox Auto Bridge */
+let extInstalled = false;
+function setExtStatus(online, text, groups = [], user = null) {
+  extInstalled = online;
+  $('hdrExtTxt').textContent = online ? 'Aktif 🟢' : 'Tidak aktif';
+  $('hdrExt').className = 'chip ' + (online ? 'online' : '');
+  $('extStatusChip').textContent = online ? 'Terhubung 🟢' : 'Belum aktif';
+  $('extStatusChip').className = 'chip ' + (online ? 'online' : 'offline');
+  if (online && user) {
+    $('extDetail').textContent = 'Roblox: ' + (user.displayName || user.name) + ' (@' + user.name + ') [ID: ' + user.id + ']';
+    $('btnExtSync').style.display = 'inline-flex';
+  } else if (online) {
+    $('extDetail').textContent = 'Ekstensi aktif. Buka roblox.com di tab lain untuk menghubungkan sesi.';
+    $('btnExtSync').style.display = 'inline-flex';
+  } else {
+    $('extDetail').textContent = 'Pasang ekstensi dari folder "extension" untuk deteksi ID & grup otomatis.';
+    $('btnExtSync').style.display = 'none';
+  }
+  if (groups && groups.length > 0) {
+    $('extGroupPicker').style.display = 'flex';
+    $('selExtGroup').innerHTML = '';
+    groups.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.name + ' (ID: ' + g.id + ') - ' + g.role;
+      $('selExtGroup').appendChild(opt);
+    });
+  }
+}
+
+window.addEventListener('message', ev => {
+  if (ev.source !== window || !ev.data || ev.data.source !== 'EAS_EXTENSION') return;
+  if (ev.data.type === 'EXTENSION_READY') {
+    window.postMessage({ source: 'EAS_PAGE', type: 'GET_ROBLOX_STATUS' }, '*');
+  } else if (ev.data.type === 'ROBLOX_STATUS_RESPONSE') {
+    const { user, groups } = ev.data.data || {};
+    setExtStatus(true, 'Aktif', groups, user);
+  } else if (ev.data.type === 'ASSET_DETECTED') {
+    const { assetId, name } = ev.data.asset || {};
+    if (assetId) {
+      rbShow(assetId, name || 'Audio Roblox Terdeteksi');
+      say('Asset ID terdeteksi dari Roblox: ' + assetId);
+    }
+  }
+});
+
+$('btnExtSync').onclick = () => {
+  window.postMessage({ source: 'EAS_PAGE', type: 'GET_ROBLOX_STATUS' }, '*');
+  flash($('btnExtSync'), 'Meminta data...');
+};
+$('btnApplyExtGroup').onclick = () => {
+  const gid = $('selExtGroup').value;
+  if (gid) {
+    $('rbGroup').value = gid;
+    flash($('btnApplyExtGroup'), 'Tersalin ke ID Grup ✓');
+  }
+};
+window.postMessage({ source: 'EAS_PAGE', type: 'PING_EXTENSION' }, '*');
+setTimeout(() => { if (!extInstalled) setExtStatus(false, 'Tidak aktif'); }, 1800);
+
+/* Tes Koneksi Server Backend (Lokal / Cloud) */
+async function testBackend(url) {
+  const target = (url !== undefined ? url : apiBase).trim().replace(/\/+$/, '');
+  const pingUrl = (target || '') + '/api/health';
+  const t0 = performance.now();
+  $('backendStatusChip').textContent = 'Menguji...';
+  $('backendStatusChip').className = 'chip';
+  try {
+    const res = await fetch(pingUrl, { method: 'GET', cache: 'no-store' });
+    const lat = Math.round(performance.now() - t0);
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const mode = data.mode === 'cloud' ? 'Cloud 24 Jam' : 'Lokal';
+      $('backendStatusChip').textContent = mode + ' (' + lat + 'ms) 🟢';
+      $('backendStatusChip').className = 'chip online';
+      $('hdrServerTxt').textContent = mode + ' 🟢';
+      $('hdrServer').className = 'chip online';
+      $('backendNote').textContent = target ? target : 'Lokal (http://127.0.0.1:8765)';
+      return true;
+    }
+    throw new Error('Status: ' + res.status);
+  } catch (err) {
+    $('backendStatusChip').textContent = 'Offline 🔴';
+    $('backendStatusChip').className = 'chip offline';
+    $('hdrServerTxt').textContent = 'Offline 🔴';
+    $('hdrServer').className = 'chip offline';
+    $('backendNote').textContent = 'Gagal terhubung ke ' + (target || 'server lokal');
+    return false;
+  }
+}
+
+$('apiBaseInput').value = apiBase;
+$('btnSaveApiBase').onclick = async () => {
+  const val = $('apiBaseInput').value.trim();
+  apiBase = val;
+  try { localStorage.setItem('eas-api-base', val); } catch (_) {}
+  await testBackend(val);
+  chkVer();
+};
+testBackend();
+
+/* tema */
+const sun='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>',moon='<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>';
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+function readCols(){const s=getComputedStyle(root),v=k=>s.getPropertyValue(k).trim();col={off:v('--wf-off'),on:v('--wf-on'),sel:v('--wf-sel'),h:v('--wf-h'),play:v('--wf-play')};$('theme').firstElementChild.innerHTML=isDark()?sun:moon;draw()}
+try{const t=localStorage.getItem('eas-theme');if(t)root.dataset.theme=t}catch(_){}
+$('theme').onclick=()=>{const t=isDark()?'light':'dark';root.dataset.theme=t;try{localStorage.setItem('eas-theme',t)}catch(_){}readCols()};
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',readCols);
+
+/* audio context */
+function getCtx(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+
+/* klik & notifikasi audio */
+function snd(f,t,d){if(!$('oClick').checked)return;try{const c=getCtx(),o=c.createOscillator(),v=c.createGain(),now=c.currentTime;o.type=t||'sine';o.frequency.value=f;v.gain.setValueAtTime(.08,now);v.gain.exponentialRampToValueAtTime(.0001,now+d);o.connect(v);v.connect(c.destination);o.start(now);o.stop(now+d)}catch(_){}}
+function sndDone(ok){if(!$('oDone').checked)return;try{const c=getCtx();if(ok){snd(523,'sine',.12);setTimeout(()=>snd(659,'sine',.12),120);setTimeout(()=>snd(784,'sine',.22),240)}else{snd(300,'sawtooth',.18);setTimeout(()=>snd(220,'sawtooth',.26),160)}}catch(_){}}
+
+let orgTitle=document.title,flashTimer=0;
+function notifyDone(msg,ok=true){sndDone(ok);if(!$('oDone').checked)return;clearInterval(flashTimer);let f=false;flashTimer=setInterval(()=>{document.title=(f=!f)?'🔔 '+msg:orgTitle},800);window.addEventListener('focus',()=>{clearInterval(flashTimer);document.title=orgTitle},{once:true})}
+function autoCopy(id){if(!$('oCopy').checked)return;copyTxt(id);flash($('rbCopy'),'Tersalin otomatis')}
+
+/* preset bawaan & pembacaan UI */
+const P=()=>({vol:+$('vol').value,spd:+$('spd').value,bass:+$('bass').value,tre:+$('tre').value,rev:+$('rev').value,dec:+$('dec').value,ech:+$('ech').value,fin:+$('fin').value,fout:+$('fout').value});
+function setP(p,anim=true){anim?tween(p):applyP(p)}
+function applyP(p){$('vol').value=p.vol;$('spd').value=p.spd;$('bass').value=p.bass;$('tre').value=p.tre;$('rev').value=p.rev;$('dec').value=p.dec;$('ech').value=p.ech;if(p.fin!=null)$('fin').value=p.fin;if(p.fout!=null)$('fout').value=p.fout;updLabels();updGraph()}
+function tween(target){const start=P(),t0=performance.now(),D=320;function step(now){const k=Math.min(1,(now-t0)/D),e=k<.5?2*k*k:-1+(4-2*k)*k,cur={};for(const key of Object.keys(start)){cur[key]=start[key]+(target[key]-start[key])*e}applyP(cur);if(k<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
+
+function updLabels(){
+  $('oVol').textContent=$('vol').value+'%';
+  $('oSpd').textContent=(+$('spd').value).toFixed(3)+'x ('+(1/+$('spd').value).toFixed(2)+'x)';
+  $('oBass').textContent=(+$('bass').value>0?'+':'')+$('bass').value+' dB';
+  $('oTre').textContent=(+$('tre').value>0?'+':'')+$('tre').value+' dB';
+  $('oRev').textContent=$('rev').value+'%';
+  $('oDec').textContent=(+$('dec').value).toFixed(1)+' dtk';
+  $('oEch').textContent=$('ech').value+'%';
+  $('oFi').textContent=(+$('fin').value).toFixed(1)+' dtk';
+  $('oFo').textContent=(+$('fout').value).toFixed(1)+' dtk';
+  $('lU').textContent=(1/+$('spd').value).toFixed(2)+'x di file';
+  for(const r of document.querySelectorAll('input[type=range]')){const mn=+r.min||0,mx=+r.max||100,v=(+r.value-mn)/(mx-mn)*100;r.style.setProperty('--v',v+'%')}
+}
+for(const id of ['vol','spd','bass','tre','rev','dec','ech','fin','fout']){$(id).oninput=()=>{snd(600,'sine',.02);updLabels();updGraph()}}
+updLabels();
+
+/* tab mode */
+for(const b of [$('_tBefore'),$('_tUpload'),$('_tAfter')].filter(Boolean)){/* noop */}
+for(const b of document.querySelectorAll('.tabs .tab')){b.onclick=()=>{document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');mode=b.dataset.m;updGraph();if(playing){const now=ctx.currentTime;off0=(off0+(now-t0)*rate0)%Math.max(.001,tB-tA);t0=now;if(src)src.playbackRate.value=calcRate()}}}
+
+/* impulse reverb */
+function makeIR(c,dur,decay){const rate=c.sampleRate,len=Math.max(1,Math.floor(rate*dur)),b=c.createBuffer(2,len,rate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);for(let i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay*2)}}return b}
+
+/* live audio graph */
+function calcRate(){const spd=+$('spd').value;if(mode==='BEFORE')return 1;if(mode==='UPLOAD')return 1/spd;return 1}
+function updGraph(){if(!playing||!ctx)return;
+  const p=P(),isB=mode==='BEFORE',isU=mode==='UPLOAD';
+  if(nodes.gain)nodes.gain.gain.value=(isB||isU)?1:(p.vol/100);
+  if(nodes.bass)nodes.bass.gain.value=(isB||isU)?0:p.bass;
+  if(nodes.tre)nodes.tre.gain.value=(isB||isU)?0:p.tre;
+  if(nodes.dry)nodes.dry.gain.value=(isB||isU)?1:(1-p.rev/100*.65);
+  if(nodes.wet)nodes.wet.gain.value=(isB||isU)?0:(p.rev/100*.9);
+  if(nodes.echoMix)nodes.echoMix.gain.value=(isB||isU)?0:(p.ech/100*.75);
+  if(src)src.playbackRate.value=calcRate();
+}
+
+function startPlayback(offset){
+  if(!buf)return;
+  stopPlayback();
+  const c=getCtx();
+  src=c.createBufferSource();
+  src.buffer=buf;
+  src.loop=true;
+  src.loopStart=tA;
+  src.loopEnd=tB;
+
+  const gain=c.createGain(),bass=c.createBiquadFilter(),tre=c.createBiquadFilter();
+  bass.type='lowshelf';bass.frequency.value=220;
+  tre.type='highshelf';tre.frequency.value=3200;
+
+  const conv=c.createConvolver(),dry=c.createGain(),wet=c.createGain();
+  conv.buffer=makeIR(c,+$('dec').value,1.5);
+
+  const echoDel=c.createDelay(1),echoFb=c.createGain(),echoMix=c.createGain();
+  echoDel.delayTime.value=.24;echoFb.gain.value=.35;
+
+  src.connect(bass);bass.connect(tre);tre.connect(gain);
+  gain.connect(dry);dry.connect(c.destination);
+  gain.connect(conv);conv.connect(wet);wet.connect(c.destination);
+
+  gain.connect(echoDel);echoDel.connect(echoFb);echoFb.connect(echoDel);
+  echoDel.connect(echoMix);echoMix.connect(c.destination);
+
+  nodes={gain,bass,tre,conv,dry,wet,echoDel,echoFb,echoMix};
+  rate0=calcRate();
+  updGraph();
+
+  const span=Math.max(.001,tB-tA);
+  const rel=((offset-tA)%span+span)%span;
+  src.start(0,tA+rel);
+  t0=c.currentTime;
+  off0=rel;
+  playing=true;
+  $('play').textContent='Jeda';
+  loopRaf();
+}
+
+function stopPlayback(){
+  if(src){try{src.stop()}catch(_){}try{src.disconnect()}catch(_){}src=null}
+  playing=false;
+  $('play').textContent='Putar';
+  cancelAnimationFrame(raf);
+  draw();
+}
+
+$('play').onclick=()=>{if(playing){stopPlayback()}else{startPlayback(pos)}};
+$('preview').onclick=()=>{pos=tA;startPlayback(tA)};
+
+function loopRaf(){
+  if(!playing)return;
+  const now=ctx.currentTime,span=Math.max(.001,tB-tA);
+  pos=tA+((off0+(now-t0)*rate0)%span);
+  draw();
+  updTime();
+  raf=requestAnimationFrame(loopRaf);
+}
+
+/* format waktu */
+function fmtTime(s){s=Math.max(0,s||0);const m=Math.floor(s/60),sec=Math.floor(s%60),ms=Math.floor((s%1)*10);return m+':'+(sec<10?'0':'')+sec+'.'+ms}
+function updTime(){$('time').textContent=fmtTime(pos)+' / '+fmtTime(tB-tA)}
+
+/* hitung peaks gelombang */
+function computePeaks(b,steps=1200){
+  const d=b.getChannelData(0),len=d.length,step=Math.floor(len/steps),res=[];
+  for(let i=0;i<steps;i++){let min=0,max=0;const s=i*step,e=Math.min(len,s+step);for(let j=s;j<e;j++){const v=d[j];if(v<min)min=v;if(v>max)max=v}res.push([min,max])}
+  return res;
+}
+
+function sizeCanvas(){const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;g.setTransform(dpr,0,0,dpr,0,0);draw()}
+window.onresize=sizeCanvas;
+
+/* render kanvas gelombang Apple style */
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight;
+  g.clearRect(0,0,w,h);
+  if(!buf||!peaks.length)return;
+  const dur=buf.duration,xA=(tA/dur)*w,xB=(tB/dur)*w,xP=(pos/dur)*w,mid=h/2;
+
+  g.fillStyle=col.sel;
+  g.fillRect(xA,0,Math.max(0,xB-xA),h);
+
+  const n=peaks.length;
+  for(let i=0;i<n;i++){
+    const x=(i/n)*w,inTrim=x>=xA&&x<=xB,[min,max]=peaks[i];
+    g.fillStyle=inTrim?col.on:col.off;
+    const y1=mid+min*(mid-4),y2=mid+max*(mid-4);
+    g.fillRect(x,y1,Math.max(1,w/n-.5),Math.max(1.5,y2-y1));
+  }
+
+  g.fillStyle=col.h;
+  g.fillRect(xA-1.5,0,3,h);
+  g.fillRect(xB-1.5,0,3,h);
+
+  if(playing||pos>0){
+    g.fillStyle=col.play;
+    g.fillRect(xP-1,0,2.5,h);
+  }
+}
+
+/* interaksi gelombang (geser handle / klik) */
+let drag=null;
+function hitTest(x){if(!buf)return null;const dur=buf.duration,w=cv.clientWidth,xA=(tA/dur)*w,xB=(tB/dur)*w;if(Math.abs(x-xA)<10)return'A';if(Math.abs(x-xB)<10)return'B';return'SEEK'}
+function posFromX(x){const dur=buf?buf.duration:0,w=cv.clientWidth;return Math.max(0,Math.min(dur,(x/w)*dur))}
+
+cv.onpointerdown=e=>{
+  if(!buf)return;
+  cv.setPointerCapture(e.pointerId);
+  const r=cv.getBoundingClientRect(),x=e.clientX-r.left,hit=hitTest(x);
+  drag=hit;
+  if(hit==='SEEK'){pos=posFromX(x);if(playing)startPlayback(pos);else draw();updTime()}
+};
+cv.onpointermove=e=>{
+  if(!buf||!drag)return;
+  const r=cv.getBoundingClientRect(),x=e.clientX-r.left,t=posFromX(x);
+  if(drag==='A'){tA=Math.min(t,tB-.1);$('tStart').value=tA.toFixed(1)}
+  else if(drag==='B'){tB=Math.max(t,tA+.1);$('tEnd').value=tB.toFixed(1)}
+  else if(drag==='SEEK'){pos=t;if(playing)startPlayback(pos)}
+  draw();updTime();
+};
+cv.onpointerup=e=>{drag=null;try{cv.releasePointerCapture(e.pointerId)}catch(_){}};
+
+$('tStart').onchange=()=>{tA=Math.max(0,Math.min(+encodeURIComponent($('tStart').value),tB-.1));draw();updTime()};
+$('tEnd').onchange=()=>{tB=Math.min(buf?buf.duration:0,Math.max(+encodeURIComponent($('tEnd').value),tA+.1));draw();updTime()};
+$('resetTrim').onclick=()=>{if(!buf)return;tA=0;tB=buf.duration;$('tStart').value=0;$('tEnd').value=tB.toFixed(1);draw();updTime()};
+
+/* potong hening */
+$('autoTrim').onclick=()=>{
+  if(!buf)return;
+  const d=buf.getChannelData(0),th=.02,rate=buf.sampleRate;let s=0,e=d.length-1;
+  while(s<d.length&&Math.abs(d[s])<th)s++;
+  while(e>s&&Math.abs(d[e])<th)e--;
+  tA=s/rate;tB=e/rate;$('tStart').value=tA.toFixed(1);$('tEnd').value=tB.toFixed(1);pos=tA;draw();updTime();
+};
+
+/* balik audio */
+$('reverse').onclick=()=>{
+  if(!buf)return;
+  for(let c=0;c<buf.numberOfChannels;c++)Array.prototype.reverse.call(buf.getChannelData(c));
+  peaks=computePeaks(buf);draw();say('Audio dibalik');
+};
+
+/* muat file audio */
+async function loadAudio(ab,name){
+  say('Mendekode audio...');
+  try{
+    const c=getCtx();
+    buf=await c.decodeAudioData(ab);
+    tA=0;tB=buf.duration;pos=0;
+    $('tStart').value=0;$('tEnd').value=tB.toFixed(1);
+    $('tStart').disabled=false;$('tEnd').disabled=false;
+    $('play').disabled=false;$('preview').disabled=false;$('export').disabled=false;
+    $('resetTrim').disabled=false;$('autoTrim').disabled=false;$('reverse').disabled=false;
+    $('auto').disabled=false;
+    for(const b of document.querySelectorAll('.tabs .tab'))b.disabled=false;
+    peaks=computePeaks(buf);
+    sizeCanvas();
+    updTime();
+    say('Siap: '+name+' ('+fmtTime(buf.duration)+')');
+    if(!$('name').value)$('name').value=rname();
+  }catch(e){say('Gagal membaca audio: '+e.message)}
+}
+
+$('fileIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;loadAudio(await f.arrayBuffer(),f.name)};
+$('drop').ondragover=e=>{e.preventDefault();$('drop').classList.add('over')};
+$('drop').ondragleave=()=>$('drop').classList.remove('over');
+$('drop').ondrop=async e=>{e.preventDefault();$('drop').classList.remove('over');const f=e.dataTransfer.files[0];if(f)loadAudio(await f.arrayBuffer(),f.name)};
+$('drop').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('fileIn').click()}};
+
+/* ambil link TikTok / YouTube */
+async function fetchMedia(url){
+  say('Menghubungi server...');
+  const ck=$('ckSel').value;
+  try{
+    const r=await fetch(API('/api/info?url='+encodeURIComponent(url)+'&cookies='+encodeURIComponent(ck)));
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Gagal mengambil media');
+    tt=d;
+    $('ttTitle').textContent=d.title;
+    $('ttAuthor').textContent='oleh '+d.by;
+    $('ttVid').src=API(d.vid);
+    $('ttAud').src=API(d.aud);
+    $('ttBox').classList.add('show');
+    say('Berhasil mengambil: '+d.title);
+  }catch(e){say('Error: '+e.message)}
+}
+$('ttGo').onclick=()=>{const u=$('ttUrl').value.trim();if(u)fetchMedia(u)};
+$('ytGo').onclick=()=>{const u=$('ytUrl').value.trim();if(u)fetchMedia(u)};
+$('ttUse').onclick=async()=>{if(!tt)return;const r=await fetch(API(tt.aud));loadAudio(await r.arrayBuffer(),tt.title)};
+$('ttDlA').onclick=()=>{if(tt)window.open(API(tt.aud),'_blank')};
+$('ttDlV').onclick=()=>{if(tt)window.open(API(tt.vid),'_blank')};
+
+/* cek versi yt-dlp */
+async function chkVer(){
+  try{
+    const r=await fetch(API('/api/version')),d=await r.json();
+    $('engVer').textContent='yt-dlp: '+(d.current||'belum ada')+(d.outdated?' (ada update: '+d.latest+')':' (terbaru)');
+  }catch(_){$('engVer').textContent='yt-dlp: offline'}
+}
+chkVer();
+$('engUpd').onclick=async()=>{
+  $('engVer').textContent='Memperbarui...';
+  try{const r=await fetch(API('/api/update'),{method:'POST'}),d=await r.json();chkVer();say(d.updated?'yt-dlp berhasil diperbarui ke '+d.current:'yt-dlp sudah versi terbaru')}catch(e){say('Update gagal: '+e.message)}
+};
+
+/* preset click */
+for(const b of document.querySelectorAll('[data-p]')){
+  b.onclick=()=>{const v=b.dataset.p.split(',').map(Number);setP({vol:v[0],spd:v[1],rev:v[2],dec:v[3],bass:v[4],tre:v[5],ech:v[6]})}
+}
+
+/* auto tuner analyzer */
+$('auto').onclick=()=>{
+  if(!buf)return;
+  setP({vol:90,spd:0.348,bass:7.5,tre:5,rev:24,dec:1.4,ech:0});
+  $('report').className='show';
+  $('report').innerHTML='<span class="chip">Profil: <b>Vokal Bersih &amp; Bass Dalam</b></span><span class="chip">Roblox Speed: <b>0.348x</b></span>';
+  say('Auto Tuner diterapkan');
+};
+
+/* nama acak & salin */
+const rname=()=>Array.from({length:5},()=>'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random()*52)]).join('');
+$('rand').onclick=()=>$('name').value=rname();
+function copyTxt(t){navigator.clipboard.writeText(t)}
+function flash(el,txt){const org=el.textContent;el.textContent=txt;setTimeout(()=>el.textContent=org,1200)}
+$('copy').onclick=()=>{copyTxt($('name').value);flash($('copy'),'Tersalin')};
+
+/* WAV encoder */
+function bufferToWave(abuffer,len){
+  const numOfChan=abuffer.numberOfChannels,length=len*numOfChan*2+44,out=new DataView(new ArrayBuffer(length));
+  let pos=0;
+  function setUint16(data){out.setUint16(pos,data,true);pos+=2}
+  function setUint32(data){out.setUint32(pos,data,true);pos+=4}
+  setUint32(0x46464952);setUint32(length-8);setUint32(0x45564157);
+  setUint32(0x20746d66);setUint32(16);setUint16(1);setUint16(numOfChan);
+  setUint32(abuffer.sampleRate);setUint32(abuffer.sampleRate*2*numOfChan);
+  setUint16(numOfChan*2);setUint16(16);setUint32(0x61746164);setUint32(length-pos-4);
+  for(let i=0;i<len;i++){for(let c=0;c<numOfChan;c++){const sample=Math.max(-1,Math.min(1,abuffer.getChannelData(c)[i]));out.setInt16(pos,sample<0?sample*0x8000:sample*0x7FFF,true);pos+=2}}
+  return new Blob([out.buffer],{type:'audio/wav'});
+}
+
+/* render audio offline untuk ekspor */
+async function renderWav(inBuf,t1,t2,p,norm){
+  const dur=t2-t1,sampleRate=inBuf.sampleRate,spd=p.spd;
+  const outDur=dur*spd,outFrames=Math.max(1,Math.floor(outDur*sampleRate));
+  const offCtx=new OfflineAudioContext(2,outFrames,sampleRate);
+
+  const src=offCtx.createBufferSource();
+  src.buffer=inBuf;
+  src.playbackRate.value=1/spd;
+
+  const gain=offCtx.createGain(),bass=offCtx.createBiquadFilter(),tre=offCtx.createBiquadFilter();
+  bass.type='lowshelf';bass.frequency.value=220;bass.gain.value=p.bass;
+  tre.type='highshelf';tre.frequency.value=3200;tre.gain.value=p.tre;
+  gain.gain.value=norm?1:(p.vol/100);
+
+  const conv=offCtx.createConvolver(),dry=offCtx.createGain(),wet=offCtx.createGain();
+  conv.buffer=makeIR(offCtx,p.dec,1.5);
+  dry.gain.value=1-(p.rev/100*.65);
+  wet.gain.value=p.rev/100*.9;
+
+  const echoDel=offCtx.createDelay(1),echoFb=offCtx.createGain(),echoMix=offCtx.createGain();
+  echoDel.delayTime.value=.24;echoFb.gain.value=.35;echoMix.gain.value=p.ech/100*.75;
+
+  src.connect(bass);bass.connect(tre);tre.connect(gain);
+  gain.connect(dry);dry.connect(offCtx.destination);
+  gain.connect(conv);conv.connect(wet);wet.connect(offCtx.destination);
+  gain.connect(echoDel);echoDel.connect(echoFb);echoFb.connect(echoDel);
+  echoDel.connect(echoMix);echoMix.connect(offCtx.destination);
+
+  src.start(0,t1,dur);
+  const rendered=await offCtx.startRendering();
+
+  if(norm){
+    let maxP=0;
+    for(let c=0;c<2;c++){const d=rendered.getChannelData(c);for(let i=0;i<d.length;i++){const v=Math.abs(d[i]);if(v>maxP)maxP=v}}
+    if(maxP>0){const mul=.98/maxP;for(let c=0;c<2;c++){const d=rendered.getChannelData(c);for(let i=0;i<d.length;i++)d[i]*=mul}}
+  }
+
+  return bufferToWave(rendered,rendered.length);
+}
+
+/* ekspor tombol */
+$('export').onclick=async()=>{
+  if(!buf)return;
+  say('Mengekspor audio potongan...');
+  const blob=await renderWav(buf,tA,tB,P(),$('norm').checked);
+  const fname=($('name').value.trim()||rname())+'.wav';
+  outFile=new File([blob],fname,{type:'audio/wav'});
+  if(outUrl)URL.revokeObjectURL(outUrl);
+  outUrl=URL.createObjectURL(blob);
+  $('rName').textContent=fname;
+  $('rInfo').textContent=(blob.size/1024).toFixed(0)+' KB • '+fmtTime(tB-tA);
+  $('result').classList.add('show');
+  $('rbFile').textContent='Hasil ekspor siap: '+fname+' ('+Math.round(blob.size/1024)+' KB)';
+  say('Ekspor berhasil: '+fname);
+};
+$('save').onclick=()=>{if(outFile){const a=document.createElement('a');a.href=outUrl;a.download=outFile.name;a.click()}};
+
+/* ==========================================================================
+   Roblox Open Cloud Upload Pipeline (Preserved 100% Intact)
+   ========================================================================== */
+let rbHist=[];try{rbHist=JSON.parse(localStorage.getItem('eas-rbhist')||'[]')||[]}catch(_){}
+const hSave=()=>{try{localStorage.setItem('eas-rbhist',JSON.stringify(rbHist))}catch(_){}};
+const hOk=()=>rbHist.filter(x=>x.state==='ok');
+const rbAssetUrl=id=>'https://create.roblox.com/dashboard/creations/marketplace/'+id+'/configure';
+
+function hAdd(item){rbHist.unshift(item);if(rbHist.length>50)rbHist.pop();hSave();rbRender()}
+function rbRender(){
+  const box=$('rbHist');
+  if(!rbHist.length){box.textContent='Belum ada riwayat.';$('hCopy').disabled=true;$('hTxt').disabled=true;$('hCsv').disabled=true;$('hClear').disabled=true;return}
+  $('hCopy').disabled=false;$('hTxt').disabled=false;$('hCsv').disabled=false;$('hClear').disabled=false;
+  box.innerHTML='';
+  rbHist.forEach(it=>{
+    const d=document.createElement('div');d.className='hrow';
+    d.innerHTML='<span><b>'+it.name+'</b> — '+(it.id?it.id:'(proses)')+'</span>';
+    if(it.id){
+      const b=document.createElement('button');b.className='btn';b.textContent='Salin';b.onclick=()=>{copyTxt(it.id);flash(b,'Tersalin')};
+      const a=document.createElement('a');a.className='btn main';a.textContent='Buka';a.href=rbAssetUrl(it.id);a.target='_blank';
+      d.append(b,a);
+    }
+    box.appendChild(d);
+  });
+}
+
+function dl(name,content,type){const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+$('hCopy').onclick=()=>{copyTxt(hOk().map(x=>x.name+' - '+x.id).join('\n'));flash($('hCopy'),'Tersalin')};
+$('hTxt').onclick=()=>dl('riwayat-roblox.txt',hOk().map(x=>x.name+' - '+x.id).join('\r\n')+'\r\n','text/plain');
+$('hCsv').onclick=()=>dl('riwayat-roblox.csv','\ufeff'+['nama,asset_id,rbxassetid,link,waktu'].concat(hOk().map(x=>[x.name,x.id,'rbxassetid://'+x.id,rbAssetUrl(x.id),x.t?new Date(x.t).toISOString():''].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','))).join('\r\n')+'\r\n','text/csv');
+$('hClear').onclick=()=>{if(!rbHist.length)return;if(!confirm('Hapus semua riwayat upload di browser ini?'))return;rbHist=[];hSave();rbRender()};
+
+function rbShow(id,name,op){
+  $('rbName').textContent=name;$('rbId').textContent=id;$('rbResult').style.display='flex';
+  $('rbLinkStore').href=rbAssetUrl(id);$('rbLinkDash').href='https://create.roblox.com/dashboard/creations?activeTab=Audio&groupId='+encodeURIComponent($('rbGroup').value.trim());$('rbLinks').style.display='flex';
+  hAdd({name,id,op:op||'',t:Date.now(),state:'ok'});
+  say('Berhasil! Audio masuk ke Roblox. ID: '+id);notifyDone('Upload selesai: '+name);autoCopy(id);
+}
+$('rbCopyUri').onclick=()=>{copyTxt('rbxassetid://'+$('rbId').textContent);flash($('rbCopyUri'),'Tersalin')};
+$('rbCopy').onclick=()=>{copyTxt($('rbId').textContent);flash($('rbCopy'),'Tersalin')};
+
+async function rbCheck(){
+  let r;try{r=await fetch(API('/api/roblox/ping'))}catch(_){throw new Error('Server backend tidak merespon. Pastikan server lokal atau server cloud aktif.')}
+  if(!r.ok)throw new Error('Server belum siap.')
+}
+
+function rbSend(fd,key,onp){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('POST',API('/api/roblox/upload'));x.setRequestHeader('X-Roblox-Key',key);
+  if(turnstileToken){fd.append('turnstile_token',turnstileToken);try{x.setRequestHeader('CF-Turnstile-Response',turnstileToken)}catch(_){}}
+  x.upload.onprogress=e=>{if(e.lengthComputable)onp(e.loaded/e.total)};
+  x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(_){}x.status>=200&&x.status<300?res(j):rej(new Error(j.error||'Upload gagal ('+x.status+')'))};
+  x.onerror=()=>rej(new Error('Gagal menghubungi server'));x.send(fd)})}
+async function rbStatusOnce(op,key){const s=await fetch(API('/api/roblox/status?op='+encodeURIComponent(op)),{headers:{'X-Roblox-Key':key}}),d=await s.json();if(!s.ok)throw new Error(d.error||'Gagal cek status');return d}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function rbPoll(op,key,onTick,maxTicks){for(let i=1;i<=maxTicks;i++){await wait(3000);const d=await rbStatusOnce(op,key);if(d.done)return d;if(onTick)onTick(i)}return null}
+
+let rbP=0,rbStep=0,rbTimer=0;
+function rbSteps(idx,err=false){
+  const s=$('rbSteps').children;
+  for(let i=0;i<s.length;i++){
+    s[i].className='step'+(i<idx?' done':(i===idx?(err?' err':' on'):''));
+  }
+}
+function rbProg(pct,phase,run=true){
+  rbP=pct;$('rbFill').style.width=pct+'%';$('rbPct').textContent=Math.round(pct)+'%';$('rbPhase').textContent=phase;
+  $('rbFill').classList.toggle('run',run);
+}
+function rbCreep(maxP){clearInterval(rbTimer);rbTimer=setInterval(()=>{if(rbP<maxP){rbP+=(maxP-rbP)*.04;rbProg(rbP,$('rbPhase').textContent)}},400)}
+
+$('rbGo').onclick=async()=>{
+  const key=$('rbKey').value.trim(),gid=$('rbGroup').value.trim();
+  if(!key||!/^\d+$/.test(gid)){say('Isi API key dan ID grup (angka) di bagian 6, lalu tekan Simpan.');$('rbSet').scrollIntoView({behavior:'smooth',block:'center'});return}
+  if(!buf){say('Pilih audio dulu di langkah 1.');return}
+  $('rbGo').disabled=true;$('rbResult').style.display='none';$('rbLinks').style.display='none';$('rbProg').style.display='block';$('rbFill').classList.remove('bad');rbSteps(0);rbProg(2,'Menyiapkan...');
+  try{
+    if(!outFile){rbProg(3,'Mengekspor audio...');rbCreep(12);await $('export').onclick();clearInterval(rbTimer);if(!outFile)throw new Error('Ekspor gagal.')}
+    if(outFile.size>20*1048576)throw new Error('File lebih dari 20 MB. Potong audionya dulu.');
+    const nm=outFile.name.replace(/\.wav$/i,'');
+    rbSteps(1);rbProg(10,'Memeriksa server...');await rbCheck();rbProg(15,'Mengirim ke server...');
+    const fd=new FormData();fd.append('file',outFile,outFile.name);fd.append('name',nm);fd.append('groupId',gid);
+    let sent=false;
+    const j=await rbSend(fd,key,f=>{if(sent)return;rbProg(15+f*30,'Mengirim ke server... '+Math.round(f*100)+'%');if(f>=1){sent=true;rbSteps(2);rbProg(48,'Roblox menerima file...');rbCreep(62)}});
+    clearInterval(rbTimer);rbSteps(2);rbProg(65,'Roblox sedang memproses dan moderasi...');rbCreep(94);
+    let d;try{d=await rbPoll(j.operationId,key,i=>{$('rbPhase').textContent='Roblox sedang memproses... ('+i*3+' dtk)'},60)}finally{clearInterval(rbTimer)}
+    if(d){if(d.error)throw new Error(d.error);rbSteps(4);rbProg(100,'Selesai',false);rbShow(d.assetId,nm,j.operationId);return}
+    rbSteps(2,true);rbProg(rbP,'Belum selesai',false);
+    hAdd({name:nm,id:'',op:j.operationId,t:Date.now(),state:'pending'});
+    say('Belum selesai setelah 3 menit. Cek lagi di Riwayat nanti.');
+    notifyDone('Masih diproses',false);
+  }catch(e){
+    clearInterval(rbTimer);rbSteps(rbStep,true);$('rbFill').classList.add('bad');rbProg(rbP,'Gagal',false);
+    say('Gagal: '+e.message);notifyDone('Upload gagal',false);
+  }finally{$('rbGo').disabled=false}
+};
+
+/* ===== antrean upload banyak sekaligus ===== */
+let Q=[],qRun=false,qSeq=0;
+const qSay=s=>$('qNote').textContent=s;
+function mkb(txt,cb){const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=cb;return b}
+function mka(txt,href){const a=document.createElement('a');a.className='btn main';a.textContent=txt;a.href=href;a.target='_blank';return a}
+
+function qAdd(files){
+  const okf=[...files].filter(f=>/^(audio|video)\//.test(f.type)||/\.(mp3|wav|ogg|m4a|flac|mp4|webm|mov)$/i.test(f.name));
+  $('qBox').open=true;
+  if(!okf.length){qSay('File yang dipilih bukan audio atau video.');return}
+  let full=false;
+  for(const f of okf){if(Q.length>=50){full=true;break}
+    let name;do{name=rname()}while(Q.some(x=>x.name===name));
+    Q.push({id:++qSeq,file:f,name,state:'wait',pct:0,msg:'Menunggu'})}
+  qRender();if(full)qSay('Antrean penuh (maks 50 file).');
+  $('qBox').scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+function qUpd(it){
+  const e=it.el;if(!e)return;
+  e.r.className='qrow '+it.state;e.st.textContent=it.state==='ok'?'ID '+it.assetId:(it.msg||'');
+  e.fill.style.width=Math.max(0,Math.min(100,it.state==='ok'?100:(it.pct||0)))+'%';
+  e.fill.classList.toggle('run',it.state==='render'||it.state==='send'||it.state==='proc');
+  e.fill.classList.toggle('bad',it.state==='fail');
+  if(e.actState!==it.state){
+    e.actState=it.state;e.act.textContent='';
+    if(it.state==='ok'){e.act.append(mkb('Salin ID',ev=>{copyTxt(it.assetId);flash(ev.currentTarget,'Tersalin')}),mka('Buka',rbAssetUrl(it.assetId)))}
+    else if(it.state==='wait'||it.state==='fail'){const x=mkb('×',()=>{Q=Q.filter(y=>y!==it);qRender()});e.act.appendChild(x)}
+  }
+}
+function qSum(){
+  const n=Q.length,fin=['ok','fail','pend'];let s=0;Q.forEach(x=>{s+=fin.includes(x.state)?100:(x.pct||0)});
+  const pct=n?s/n:0,done=Q.filter(x=>fin.includes(x.state)).length;
+  $('qSumBox').style.display=n&&(qRun||Q.some(x=>x.state!=='wait'))?'block':'none';
+  $('qFill').style.width=pct+'%';$('qFill').classList.toggle('run',qRun);$('qPct').textContent=Math.round(pct)+'%';$('qPhase').textContent=done+' dari '+n+' selesai';
+  $('qGo').disabled=qRun||!Q.some(x=>x.state==='wait'||x.state==='fail');$('qClear').disabled=qRun||!n;$('qCopy').disabled=!Q.some(x=>x.state==='ok');
+}
+function qRender(){
+  const L=$('qList');L.textContent='';
+  Q.forEach(it=>{
+    const r=document.createElement('div'),top=document.createElement('div'),nm=document.createElement('span'),st=document.createElement('span'),act=document.createElement('span'),bar=document.createElement('div'),fill=document.createElement('div');
+    r.className='qrow';top.className='qtop';nm.className='qname';st.className='qst';act.className='qact';bar.className='pbar sm';fill.className='pfill';
+    nm.textContent=it.file.name+' → '+it.name;nm.title=nm.textContent;
+    top.append(nm,st,act);bar.appendChild(fill);r.append(top,bar);L.appendChild(r);
+    it.el={r,st,act,fill,actState:null};qUpd(it);
+  });
+  qSay(!Q.length?'Belum ada file di antrean.':qRun?'Sedang berjalan...':Q.length+' file di antrean.');qSum();
+}
+async function qProcess(it,p,norm,key,gid){
+  const set=(state,pct,msg)=>{it.state=state;it.pct=pct;it.msg=msg;qUpd(it);qSum()};
+  let creep=0;
+  try{
+    set('render',5,'Mengekspor...');
+    const b=await getCtx().decodeAudioData(await it.file.arrayBuffer());
+    set('render',20,'Mengekspor...');
+    const blob=await renderWav(b,0,b.duration,p,norm);
+    if(blob.size>20*1048576)throw new Error('Hasil ekspor > 20 MB.');
+    const fname=it.name+'.wav',fd=new FormData();
+    fd.append('file',new File([blob],fname,{type:'audio/wav'}),fname);fd.append('name',it.name);fd.append('groupId',gid);
+    set('send',30,'Mengirim ke server...');
+    let j;
+    for(let tries=0;;tries++){
+      try{j=await rbSend(fd,key,f=>{it.pct=30+f*22;qUpd(it);qSum()});break}
+      catch(e){if(tries<2&&/\(429\)/.test(e.message)){set('send',it.pct,'Batas rate limit Roblox, tunggu 15 dtk...');await wait(15000);continue}throw e}
+    }
+    set('proc',55,'Roblox memproses...');
+    creep=setInterval(()=>{if(it.pct<94){it.pct+=(94-it.pct)*.05;qUpd(it);qSum()}},500);
+    const d=await rbPoll(j.operationId,key,i=>{it.msg='Roblox memproses... ('+i*3+' dtk)';qUpd(it)},60);
+    clearInterval(creep);
+    if(!d){set('pend',it.pct,'Belum selesai, cek riwayat');hAdd({name:it.name,id:'',op:j.operationId,t:Date.now(),state:'pending'});return}
+    if(d.error)throw new Error(d.error);
+    it.assetId=d.assetId;set('ok',100,'');hAdd({name:it.name,id:d.assetId,op:j.operationId,t:Date.now(),state:'ok'});
+  }catch(e){clearInterval(creep);set('fail',it.pct,e.message)}
+}
+async function qStart(){
+  if(qRun||!Q.some(x=>x.state==='wait'||x.state==='fail'))return;
+  const key=$('rbKey').value.trim(),gid=$('rbGroup').value.trim();
+  if(!key||!/^\d+$/.test(gid)){say('Isi API key dan ID grup dulu.');return}
+  try{await rbCheck()}catch(e){qSay('Gagal: '+e.message);return}
+  Q.forEach(x=>{if(x.state==='fail'){x.state='wait';x.pct=0;x.msg='Menunggu'}});
+  const p=P(),norm=$('norm').checked;
+  qRun=true;qRender();
+  const worker=async()=>{for(;;){const it=Q.find(x=>x.state==='wait');if(!it)return;it.state='render';await qProcess(it,p,norm,key,gid)}};
+  await Promise.all([worker(),worker(),worker()]);
+  qRun=false;qRender();
+  const c=s=>Q.filter(x=>x.state===s).length,ok=c('ok'),bad=c('fail');
+  qSay(ok+' berhasil'+(bad?', '+bad+' gagal':'')+'.');
+  if(ok)autoCopy(Q.filter(x=>x.state==='ok').map(x=>x.name+' - '+x.assetId).join('\n'));
+  notifyDone('Upload antrean selesai');
+}
+$('qIn').onchange=e=>{qAdd(e.target.files);e.target.value=''};
+$('qDrop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('qIn').click()}});
+$('qGo').onclick=qStart;
+$('qClear').onclick=()=>{if(qRun)return;Q=[];qRender()};
+$('qCopy').onclick=()=>{copyTxt(Q.filter(x=>x.state==='ok').map(x=>x.name+' - '+x.assetId).join('\n'));flash($('qCopy'),'Tersalin')};
+
+/* ===== preset buatan sendiri ===== */
+const PKEYS=['vol','spd','rev','dec','bass','tre','ech','fin','fout'];
+let myP=[];try{myP=(JSON.parse(localStorage.getItem('eas-presets')||'[]')||[]).filter(x=>x&&x.name&&x.v)}catch(_){}
+const pSaveLS=()=>{try{localStorage.setItem('eas-presets',JSON.stringify(myP))}catch(_){}};
+function pRender(){const h=$('myPresets');h.textContent='';
+  myP.forEach(pr=>{const w=document.createElement('span');w.className='pchip';
+    const b=mkb(pr.name,()=>{$('report').classList.remove('show');tween(pr.v)});b.title='Terapkan preset ini';
+    const x=mkb('×',()=>{myP=myP.filter(y=>y!==pr);pSaveLS();pRender()});x.classList.add('x');x.setAttribute('aria-label','Hapus preset '+pr.name);
+    w.append(b,x);h.appendChild(w)})}
+$('pSave').onclick=()=>{const n=$('pName').value.trim().slice(0,20);
+  if(!n){$('pName').focus();flash($('pSave'),'Isi nama dulu');return}
+  const v={};PKEYS.forEach(k=>v[k]=+$(k).value);
+  const i=myP.findIndex(x=>x.name.toLowerCase()===n.toLowerCase());
+  if(i>=0)myP[i]={name:n,v};else{if(myP.length>=20){flash($('pSave'),'Maks 20 preset');return}myP.push({name:n,v})}
+  pSaveLS();pRender();$('pName').value='';flash($('pSave'),'Tersimpan ✓')};
+$('pName').addEventListener('keydown',e=>{if(e.key==='Enter')$('pSave').click()});
+
+/* simpan / hapus / lihat akun */
+$('rbSave').onclick=()=>{const key=$('rbKey').value.trim(),gid=$('rbGroup').value.trim();
+  if(!key||!/^\d+$/.test(gid)){$('rbSetNote').textContent='Isi API key dan ID grup (angka saja) dulu.';return}
+  try{localStorage.setItem('eas-rbkey',key);localStorage.setItem('eas-rbgroup',gid);$('rbSetNote').textContent='Tersimpan di browser ini.';$('rbSave').textContent='Tersimpan ✓';setTimeout(()=>$('rbSave').textContent='Simpan',1500)}
+  catch(_){$('rbSetNote').textContent='Gagal menyimpan data.'}};
+$('rbClear').onclick=()=>{try{localStorage.removeItem('eas-rbkey');localStorage.removeItem('eas-rbgroup')}catch(_){}$('rbKey').value='';$('rbGroup').value='';$('rbSetNote').textContent='Data akun dihapus dari browser ini.'};
+$('rbShowKey').onclick=()=>{const k=$('rbKey'),h=k.type==='password';k.type=h?'text':'password';$('rbShowKey').textContent=h?'Sembunyikan':'Lihat key'};
+try{
+  const k=localStorage.getItem('eas-rbkey'),g=localStorage.getItem('eas-rbgroup');
+  if(k)$('rbKey').value=k;if(g)$('rbGroup').value=g;
+}catch(_){}
+
+pRender();rbRender();qRender();
+readCols();sizeCanvas();
+</script>
+</body>
+</html>

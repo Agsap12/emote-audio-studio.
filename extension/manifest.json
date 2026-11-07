@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Emote Audio Studio — Roblox Auto Bridge",
+  "version": "1.0.0",
+  "description": "Deteksi ID otomatis Roblox, sinkronisasi akun & grup, serta auto-upload audio langsung untuk Emote Audio Studio.",
+  "permissions": [
+    "storage",
+    "cookies",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.roblox.com/*",
+    "*://create.roblox.com/*",
+    "*://apis.roblox.com/*",
+    "*://127.0.0.1/*",
+    "*://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://create.roblox.com/*",
+        "*://*.roblox.com/develop*"
+      ],
+      "js": ["content_roblox.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://127.0.0.1/*",
+        "*://localhost/*",
+        "*://*/*"
+      ],
+      "js": ["content_eas.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Emote Audio Studio — Roblox Bridge"
+  }
+}
